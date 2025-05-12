@@ -1,0 +1,38 @@
+---
+- name: tp01 install apache2 
+  hosts: all
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    html_root: /var/www/html
+  tasks:
+
+  - name: Install apache2
+    ansible.builtin.apt:
+      name: apache2
+      state: present
+
+  - name: check {{ html_root }}
+    ansible.builtin.file:
+      path: "{{ html_root }}" 
+      state: directory
+
+  - name: delete index.html
+    ansible.builtin.file:
+      path: "{{ html_root }}/index.html"
+      state: absent
+
+
+  - name: write content
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h1>Welcome to {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        mode: '0644'
+        create: true
+
+  - name: gestion service
+    ansible.builtin.service:
+      name: apache2
+      state: started
+      enabled: true
