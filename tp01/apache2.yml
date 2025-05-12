@@ -1,6 +1,6 @@
 ---
 - name: tp01 install apache2 
-  hosts: installapache 
+  hosts: apache 
   remote_user: ambient-user
   become: true
   become_user: root
@@ -12,6 +12,7 @@
     ansible.builtin.apt:
       name: apache2
       state: present
+      update_cache: yes
 
   - name: check {{ html_root }}
     ansible.builtin.file:
