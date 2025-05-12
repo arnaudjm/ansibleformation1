@@ -1,0 +1,3 @@
+ansible-playbook -i hosts.yml  apache2.yml
+ansible-playbook -i hosts_without_password.yml  --extra-vars "@vault.yml" --ask-vault-pass apache2.yml
+

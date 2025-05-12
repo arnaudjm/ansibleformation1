@@ -1,0 +1,56 @@
+---
+- name: tp02
+  hosts: all 
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  tasks:
+
+  - name: Install softwares machine1
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - apache2
+      - mysql-server
+    when: ansible_facts['nodename'] == "node01" or ansible_facts['nodename'] == "node02" 
+
+
+
+  - name: Install softwares machine3
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - git
+      - nginx
+      - cowsay
+    when: ansible_facts['nodename'] == "node03"
+
+
+
+
+  - name: Install pecific ubuntu
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - ufw
+    when: ansible_facts['os_family'] == "Ubuntu"
+
+
+
+
+
+  - name: Install pecific debian
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop:
+      - sl
+    when: ansible_facts['os_family'] == "Debian"
+
