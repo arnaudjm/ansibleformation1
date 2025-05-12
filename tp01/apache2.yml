@@ -28,7 +28,7 @@
   - name: write content
     ansible.builtin.lineinfile:
         path: "{{ html_root }}/index.html"
-        line: "<h1>Welcome to {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        line: "<h1>Welcome to {{ ansible_hostname }}  {{ ansible_date_time.iso8601 }}</h1>"
         mode: '0644'
         create: true
 
