@@ -4,6 +4,8 @@
   remote_user: ambient-user
   become: true
   become_user: root
+  vars:
+    html_root: /var/www/html
   tasks:
 
   - name: Install softwares machine1
@@ -16,8 +18,6 @@
       - mysql-server
     when: ansible_facts['nodename'] == "node01" or ansible_facts['nodename'] == "node02" 
 
-
-
   - name: Install softwares machine3
     ansible.builtin.apt:
       name: "{{ item }}"
@@ -29,28 +29,98 @@
       - cowsay
     when: ansible_facts['nodename'] == "node03"
 
-
-
-
   - name: Install pecific ubuntu
     ansible.builtin.apt:
       name: "{{ item }}"
-      state: present
+      state: latest
       update_cache: yes
     loop:
       - ufw
     when: ansible_facts['os_family'] == "Ubuntu"
 
 
-
-
-
   - name: Install pecific debian
     ansible.builtin.apt:
       name: "{{ item }}"
-      state: present
+      state: latest
       update_cache: yes
     loop:
       - sl
     when: ansible_facts['os_family'] == "Debian"
+
+  - name: check {{ html_root }}
+    ansible.builtin.file:
+      path: "{{ html_root }}" 
+      state: directory
+
+  - name: delete index.html
+    ansible.builtin.file:
+      path: "{{ html_root }}/index.html"
+      state: absent
+
+
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: write content html
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h1>Bonjour depuis Ansible sur {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        mode: '0644'
+        create: true
+    when: "'apache2' in ansible_facts.packages or 'nginx' in ansible_facts.packages"
+
+
+  - name: gestion service apache
+    ansible.builtin.service:
+      name: apache2
+      state: started
+      enabled: true
+    when: ansible_facts['nodename'] == "node01" or ansible_facts['nodename'] == "node02"
+
+  - name: gestion service nginx
+    ansible.builtin.service:
+      name: nginx
+      state: started
+      enabled: true
+    when: ansible_facts['nodename'] == "node03"
+
+
+  - name: write content html pair>12h
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h2>pair et plus tard que midi</h2>"
+        mode: '0644'
+        create: true
+    when: ansible_facts['date_time']['hour'] > "12" and ansible_facts['date_time']['day'] % 2 == "0"
+
+
+  - name: write content html pair<=12h
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h2>pair et avant que midi</h2>"
+        mode: '0644'
+        create: true
+    when: ansible_facts['date_time']['hour'] <= "12" and ansible_facts['date_time']['day'] % 2 == "0"
+
+  - name: write content html impair>12h
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h2>impair et plus tard que midi</h2>"
+        mode: '0644'
+        create: true
+    when: ansible_facts['date_time']['hour'] > "12" and ansible_facts['date_time']['day'] % 2 == "1"
+
+
+  - name: write content html impair<=12h
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h2>impair et avant que midi</h2>"
+        mode: '0644'
+        create: true
+    when: ansible_facts['date_time']['hour'] <= "12" and ansible_facts['date_time']['day'] % 2 == "1"
+
+
+
 
