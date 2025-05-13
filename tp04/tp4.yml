@@ -7,7 +7,7 @@
   vars:
     html_root: /var/www/html
     etcjour: /etc/jour
-    apache_listen_port: 88
+    noapache_listen_port: 88
   vars_files:
     - vars/main.yml  
 
@@ -19,3 +19,12 @@
     - name: Import tp2
       ansible.builtin.include_tasks: tp2.yml
       tags: onlyimport
+
+    - name : install mysql
+      ansible.builtin.include_role: 
+        name: geerlingguy.mysql
+
+    - name : install apache
+      ansible.builtin.include_role: 
+        name: geerlingguy.apache
+
