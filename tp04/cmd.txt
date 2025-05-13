@@ -1,0 +1,8 @@
+ansible-galaxy install -r requirements.yml
+
+ansible-playbook -i hosts.yml tp2.yaml --list-tasks
+ansible-playbook -i hosts.yml tp2.yaml --list-tags
+ansible-playbook -i hosts.yml  tp3.yml
+ansible-playbook -i hosts_without_password.yml  --extra-vars "@vault.yml" --ask-vault-pass tp3.yml
+
+--start-at-task=''

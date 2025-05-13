@@ -1,0 +1,21 @@
+---
+- name: tp04
+  hosts: apache 
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    html_root: /var/www/html
+    etcjour: /etc/jour
+    apache_listen_port: 88
+  vars_files:
+    - vars/main.yml  
+
+  roles:
+    - geerlingguy.apache
+    - geerlingguy.mysql
+
+  tasks:
+    - name: Import tp2
+      ansible.builtin.include_tasks: tp2.yml
+      tags: onlyimport

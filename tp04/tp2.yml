@@ -1,0 +1,27 @@
+  - name: step4 install ufw
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: latest
+      update_cache: yes
+    loop:
+      - ufw
+    when: ansible_distribution == "Ubuntu"
+    tags: step3
+
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: write content html
+    ansible.builtin.lineinfile:
+        path: "{{ html_root }}/index.html"
+        line: "<h1>Bonjour depuis Ansible sur {{ ansible_hostname }}  {{ ansible_date_time.date }}</h1>"
+        mode: '0644'
+        create: true
+    when: "'apache2' in ansible_facts.packages or 'nginx' in ansible_facts.packages"
+
+  - name: step5 creation jour
+    ansible.builtin.template:
+      src: templates/jour.ini.j2
+      dest: "{{ etcjour }}"
+    tags: step5

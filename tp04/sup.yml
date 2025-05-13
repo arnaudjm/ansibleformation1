@@ -1,0 +1,21 @@
+---
+- name: sup 
+  hosts: all 
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars:
+    html_root: /var/www/html
+  tasks:
+
+  - name: desinstallation 
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: absent
+    loop:
+      - git
+      - nginx
+      - cowsay
+      - apache2
+      - mysql-server
+
