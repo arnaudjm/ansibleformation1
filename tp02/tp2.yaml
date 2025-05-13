@@ -6,7 +6,7 @@
   become_user: root
   vars:
     html_root: /var/www/html
-    etcjou: /etc/jour
+    etcjour: /etc/jour
   tasks:
 
   - name: Install softwares machine1
@@ -89,7 +89,7 @@
   - name: creation jour
     ansible.builtin.template:
       src: templates/jour.ini.j2
-      dest: /etc/jour
+      dest: "{{ etcjour }}"
     tags: test
 
   - name: write jour pair>12h
@@ -98,7 +98,7 @@
         line: "pair et plus tard que midi"
         mode: '0644'
         create: true
-    when: (ansible_facts['date_time']['hour'] > "12") and (ansible_facts['date_time']['day']  is divisibleby "2")
+    when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
 
 
   - name: write jour pair<=12h
@@ -107,7 +107,7 @@
         line: "pair et avant que midi"
         mode: '0644'
         create: true
-    when: (ansible_facts['date_time']['hour'] <= "12") and (ansible_facts['date_time']['day']  == "0")
+    when: (ansible_facts['date_time']['hour']|int <= 12) and (ansible_facts['date_time']['day']|int % 2 == 0)
 
   - name: write jour impair>12h
     ansible.builtin.lineinfile:
@@ -115,7 +115,7 @@
         line: "impair et plus tard que midi"
         mode: '0644'
         create: true
-    when: (ansible_facts['date_time']['hour'] > "12") and (ansible_facts['date_time']['day']  == "1")
+    when: (ansible_facts['date_time']['hour']|int > 12) and (ansible_facts['date_time']['day']|int % 2 == 1)
 
 
   - name: write jour impair<=12h
@@ -124,7 +124,7 @@
         line: "impair et avant que midi"
         mode: '0644'
         create: true
-    when: (ansible_facts['date_time']['hour'] <= "12") and (ansible_facts['date_time']['day']  == "1")
+    when: (ansible_facts['date_time']['hour']|int <= 12) and (ansible_facts['date_time']['day']|int % 2  == 1)
 
 
 
