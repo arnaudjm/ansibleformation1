@@ -1,0 +1,28 @@
+---
+- name: tp05
+  hosts: db 
+  remote_user: ambient-user
+  become: true
+  become_user: root
+  vars_files:
+    - vars/main.yml  
+    - vault.yml
+
+  tasks:
+    - name: Setting host facts using complex arguments
+      ansible.builtin.set_fact:
+        one_fact: something
+        dbname_fact: "db_{{ ansible_hostname[-1:]|int * 3 }}"
+      tags: fact
+
+    - name: Prints two lines of messages, but only if there is an environment value set
+      ansible.builtin.debug:
+        msg:
+        - "calcul {{ dbname_fact }}" 
+      tags: fact
+
+    - name : install mysql
+      ansible.builtin.include_role: 
+        name: geerlingguy.mysql
+      tags: database
+

@@ -1,0 +1,5 @@
+ansible-galaxy install -r requirements.yml
+
+ansible-playbook -i hosts_without_password.yml  --extra-vars "@vault.yml" --vault-password-file vault.pass.txt tp5.yml
+
+--start-at-task=''
