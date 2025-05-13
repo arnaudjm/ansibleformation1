@@ -6,6 +6,7 @@
   become_user: root
   vars:
     html_root: /var/www/html
+    etcjou: /etc/jour
   tasks:
 
   - name: Install softwares machine1
@@ -36,7 +37,7 @@
       update_cache: yes
     loop:
       - ufw
-    when: ansible_facts['os_family'] == "Ubuntu"
+    when: ansible_distribution == "Ubuntu"
 
 
   - name: Install pecific debian
@@ -46,7 +47,7 @@
       update_cache: yes
     loop:
       - sl
-    when: ansible_facts['os_family'] == "Debian"
+    when: ansible_distribution == "Debian"
 
   - name: check {{ html_root }}
     ansible.builtin.file:
@@ -71,7 +72,6 @@
         create: true
     when: "'apache2' in ansible_facts.packages or 'nginx' in ansible_facts.packages"
 
-
   - name: gestion service apache
     ansible.builtin.service:
       name: apache2
@@ -86,41 +86,54 @@
       enabled: true
     when: ansible_facts['nodename'] == "node03"
 
+  - name: creation jour
+    ansible.builtin.template:
+      src: templates/jour.ini.j2
+      dest: /etc/jour
+    tags: test
 
-  - name: write content html pair>12h
+  - name: write jour pair>12h
     ansible.builtin.lineinfile:
-        path: "{{ html_root }}/index.html"
-        line: "<h2>pair et plus tard que midi</h2>"
+        path: "{{ etcjour }}"
+        line: "pair et plus tard que midi"
         mode: '0644'
         create: true
-    when: ansible_facts['date_time']['hour'] > "12" and ansible_facts['date_time']['day'] % 2 == "0"
+    when: (ansible_facts['date_time']['hour'] > "12") and (ansible_facts['date_time']['day']  is divisibleby "2")
 
 
-  - name: write content html pair<=12h
+  - name: write jour pair<=12h
     ansible.builtin.lineinfile:
-        path: "{{ html_root }}/index.html"
-        line: "<h2>pair et avant que midi</h2>"
+        path: "{{ etcjour }}"
+        line: "pair et avant que midi"
         mode: '0644'
         create: true
-    when: ansible_facts['date_time']['hour'] <= "12" and ansible_facts['date_time']['day'] % 2 == "0"
+    when: (ansible_facts['date_time']['hour'] <= "12") and (ansible_facts['date_time']['day']  == "0")
 
-  - name: write content html impair>12h
+  - name: write jour impair>12h
     ansible.builtin.lineinfile:
-        path: "{{ html_root }}/index.html"
-        line: "<h2>impair et plus tard que midi</h2>"
+        path: "{{ etcjour }}"
+        line: "impair et plus tard que midi"
         mode: '0644'
         create: true
-    when: ansible_facts['date_time']['hour'] > "12" and ansible_facts['date_time']['day'] % 2 == "1"
+    when: (ansible_facts['date_time']['hour'] > "12") and (ansible_facts['date_time']['day']  == "1")
 
 
-  - name: write content html impair<=12h
+  - name: write jour impair<=12h
     ansible.builtin.lineinfile:
-        path: "{{ html_root }}/index.html"
-        line: "<h2>impair et avant que midi</h2>"
+        path: "{{ etcjour }}"
+        line: "impair et avant que midi"
         mode: '0644'
         create: true
-    when: ansible_facts['date_time']['hour'] <= "12" and ansible_facts['date_time']['day'] % 2 == "1"
+    when: (ansible_facts['date_time']['hour'] <= "12") and (ansible_facts['date_time']['day']  == "1")
 
 
+
+
+
+  handlers:
+    - name: Restart apache
+      ansible.builtin.service:
+        name: apache2
+        state: restarted
 
 
